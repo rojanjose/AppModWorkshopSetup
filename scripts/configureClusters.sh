@@ -1,6 +1,19 @@
 #!/bin/bash
 
-CLUSTER_RANGE=$1;
+CLUSTER_RANGE="${CLUSTER_RANGE:-1-50}"
+
+for OPT in "$@"; do
+    case "$OPT" in
+        -r=*|--cluster-range=*)
+            CLUSTER_RANGE="${OPT#*=}"
+            ;;
+        *)
+            echo "Unexpected flag $OPT"
+            exit 2
+            ;;
+    esac
+done
+
 CSTART=$(cut -d'-' -f1 <<< "$CLUSTER_RANGE");
 CEND=$(cut -d'-' -f2 <<< "$CLUSTER_RANGE");
 
