@@ -21,8 +21,13 @@ for OPT in "$@"; do
         -u=*|--user-list=*)
             USER_LIST="${OPT#*=}"
             ;;
+        -h|--help)
+            print_help
+            exit 0
+            ;;
         *)
             echo "Unexpected flag $OPT"
+            print_help
             exit 2
             ;;
     esac
