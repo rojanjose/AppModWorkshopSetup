@@ -5,7 +5,7 @@
 Help for each script can be found by calling them with the ```-h``` or ```--help``` flags. Here is a brief listing of each:
 
 
-innviteUsers.sh:
+inviteUsers.sh:
 ```text
 Usage: ./inviteUsers.sh [OPTIONS]...
 
@@ -88,3 +88,17 @@ Mandatory arguments to long options are mandatory for short options too.
   -r=,  --cluster-range=NUM1-NUM2    range from NUM1 to NUM2 for cluster numbers;
   -h   --help                        display this help and exit
 ```
+
+
+removeUsers.sh:
+```text
+Usage: ./removeUsers.sh [OPTIONS]...
+
+Remove users from account
+
+Mandatory arguments to long options are mandatory for short options too.
+  -u=,  --user-list=FILE      FILE where users email addresses are stored;
+                                  defaults to email.txt
+  -h   --help                 display this help and exit
+```
+
