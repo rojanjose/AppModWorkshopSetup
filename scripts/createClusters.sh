@@ -2,7 +2,7 @@
 
 HARDWARE="${HARDWARE:-shared}"
 KUBE_VERSION="${KUBE_VERSION:-1.13.6}"
-MACHINE_TYPE="${MACHINE_TYPE:-u2c.2x4}"
+MACHINE_TYPE="${MACHINE_TYPE:-b3c.4x16}"
 PRIVATE_VLAN="${PRIVATE_VLAN:-2573695}"
 PUBLIC_VLAN="${PUBLIC_VLAN:-2573693}"
 WORKER_NODE_COUNT="${WORKER_NODE_COUNT:-2}"
@@ -21,7 +21,7 @@ Mandatory arguments to long options are mandatory for short options too.
       --kube-version=NUM             k8s version to install;
                                          defaults to 1.12.6
   -t=,  --machine-type=STRING        STRING machine configuration;
-                                         defaults to u2c.2x4
+                                         defaults to b3c.4x16
       --private-vlan=NUM             use private vlan identified by NUM;
                                          defaults to 2573695
       --public-vlan=NUM              use public vlan identified by NUM;
