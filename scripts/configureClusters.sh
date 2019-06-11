@@ -50,4 +50,14 @@ for num in $(seq -f "%03g" "$CSTART" "$CEND"); do
 
     # set up istio
     yes | ibmcloud ks cluster-addon-enable istio-extras --cluster "$CLUSTER_NAME"
+
+    # waiting a moment for istio setup to progress
+    while [[ $(kubectl get configmap istio -n istio-system 2>/dev/null | grep NAME | wc -l) -ne 1 ]]
+    do
+      echo "sleeping a moment for istio to configure"
+      sleep 2
+    done
+
+    # patch configmap for istio to enable mixer policy checking
+    kubectl get configmap istio -o yaml -n istio-system | sed 's/disablePolicyChecks: true/disablePolicyChecks: false/' | kubectl -n istio-system replace -f -
 done
