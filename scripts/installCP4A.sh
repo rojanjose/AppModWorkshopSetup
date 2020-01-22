@@ -81,9 +81,17 @@ CSTART=$(cut -d'-' -f1 <<< "$CLUSTER_RANGE");
 CEND=$(cut -d'-' -f2 <<< "$CLUSTER_RANGE");
 
 for num in $(seq -f "%02g" "$CSTART" "$CEND"); do
-    # CLUSTER_NAME="user$num-cluster"
-    CLUSTER_NAME="cp4a-fi-$num"
+    CLUSTER_NAME="user$num-cluster"
     echo "Configuring cluster $CLUSTER_NAME ..."
+
+    # fix docker registry IOPS
+    ibmcloud login --apikey $IBM_CLOUD_APIKEY
+    eval $(ibmcloud ks cluster-config --cluster "$CLUSTER_NAME" --export)
+    oc login -u apikey -p $IBM_CLOUD_APIKEY
+
+    REGISTRY_PV=$(oc get pvc registry-backing -o jsonpath='{.spec.volumeName}')
+    REGISTRY_VOLID=$(oc get pv $REGISTRY_PV -o jsonpath='{.metadata.labels.volumeId}')
+    yes | ibmcloud sl file volume-modify $REGISTRY_VOLID --new-tier 10
     
     # install Cloud Pak for Applications
     docker run -u 0 -t -v $PWD/data:/installer/data:z -e LICENSE=accept -e ENTITLED_REGISTRY \
@@ -91,6 +99,7 @@ for num in $(seq -f "%02g" "$CSTART" "$CEND"); do
     -e OPENSHIFT_URL="$(ibmcloud oc cluster get "$CLUSTER_NAME" --json | jq .serverURL |  tr -d \" )" \
     -e OPENSHIFT_PASSWORD="$IBM_CLOUD_APIKEY" "$ENTITLED_REGISTRY/cp/icpa/icpa-installer:$ICPA_VERSION" install
 
+    oc logout
 done
 
 # clean up config file directory (uncomment to view install logs)
