@@ -11,8 +11,11 @@ Mandatory arguments to long options are mandatory for short options too.
                                          defaults to 1-50
   -h   --help                        display this help and exit
 
+  -t   --tiller                      install Tiller component of Helm v2.x, optional
 EOF
 }
+
+TILLER="false";
 
 for OPT in "$@"; do
     case "$OPT" in
@@ -22,6 +25,9 @@ for OPT in "$@"; do
         -h|--help)
             print_help
             exit 0
+            ;;
+        -t|--tiller)
+            TILLER="true"
             ;;
         *)
             echo "Unexpected flag $OPT"
@@ -45,11 +51,17 @@ for num in $(seq -f "%03g" "$CSTART" "$CEND"); do
     echo "Configuring cluster $CLUSTER_NAME ..."
 
     eval $(ibmcloud ks cluster-config --cluster "$CLUSTER_NAME" --export)
-    kubectl apply -f https://raw.githubusercontent.com/IBM-Cloud/kube-samples/master/rbac/serviceaccount-tiller.yaml
-    helm init --service-account tiller
+
+    # install Tiller (Tiller component is removed since Helm v3)
+    if [ $TILLER == 'true' ] 
+    then    
+        kubectl apply -f https://raw.githubusercontent.com/IBM-Cloud/kube-samples/master/rbac/serviceaccount-tiller.yaml
+        helm init --service-account tiller
+    fi
 
     # set up istio
-    yes | ibmcloud ks cluster-addon-enable istio-extras --cluster "$CLUSTER_NAME"
+    #yes | ibmcloud ks cluster-addon-enable istio-extras --cluster "$CLUSTER_NAME"
+    yes | ibmcloud ks cluster addon enable istio --cluster "$CLUSTER_NAME"
 
     # waiting a moment for istio setup to progress
     while [[ $(kubectl get configmap istio -n istio-system 2>/dev/null | grep NAME | wc -l) -ne 1 ]]
